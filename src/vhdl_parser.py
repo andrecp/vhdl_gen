@@ -8,9 +8,9 @@ import getpass
 
 now = datetime.datetime.now()
 
-def parse_vhdl(texto):
-    if '#' in texto:
-        entrada = texto.split('#')
+def parse_vhdl(text):
+    if '#' in text:
+        entrada = text.split('#')
         temp = entrada[0]
         temp = temp[:-1]
         entrada[0] = temp
@@ -25,8 +25,8 @@ def parse_vhdl(texto):
         s = "Nao foi encontrado um # com os registradores no arquivo de entrada"
     return s
 
-def parse_tb(texto):
-    return texto
+def parse_tb(text):
+    return text
 
 def cabecario_entidade():
     string = "------------------------------------------------------\n\
@@ -41,13 +41,13 @@ use ieee.std_logic_1164.all;\n\
 use ieee.numeric_std.all;\n"
     return string
 
-def declaracao_entidade(texto,nome_entidade):
-    texto = texto + "\n\
+def declaracao_entidade(text,nome_entidade):
+    text = text + "\n\
 entity "+nome_entidade+" is\n\
   port (\n"
-    return texto
+    return text
 
-def declaracao_portas(texto,linhas_portas,nome_entidade):
+def declaracao_portas(text,linhas_portas,nome_entidade):
     for i in linhas_portas:
         i = i.replace("\r","")
         partes_linha = i.split("-");
@@ -63,24 +63,24 @@ def declaracao_portas(texto,linhas_portas,nome_entidade):
                 temp = temp + " std_logic_vector(" + str(ajusta_bits) +" downto 0);"
             else:
                 temp = "    "+j
-        texto=texto+temp+"\n"
-    texto = texto[:-2] + "\n"
-    texto = texto + "    );\n"
-    texto = texto + "end " + nome_entidade + ";"
-    return texto;
+        text=text+temp+"\n"
+    text = text[:-2] + "\n"
+    text = text + "    );\n"
+    text = text + "end " + nome_entidade + ";"
+    return text;
 
-def adiciona_menos(texto):
-    texto = texto + "\n\n------------------------------------------------------\n\n"
-    return texto
+def adiciona_menos(text):
+    text = text + "\n\n------------------------------------------------------\n\n"
+    return text
 
-def adiciona_arquitetura(texto, nome_entidade,clk,rst,regs):
+def adiciona_arquitetura(text, nome_entidade,clk,rst,regs):
     clk = clk.split("-")
     clk = clk[0]
     rst = rst.split("-")
     rst = rst[0]
     regs = regs[1:-1]
     dicionario_regs = {}
-    texto = texto +"\
+    text = text +"\
 architecture rtl of "+ nome_entidade + " is\n\
   type STATE_MACHINE_TYPE is (S0,S1,S2,S3);\n\n\
   attribute SYN_ENCODING : string;\n\
@@ -106,10 +106,10 @@ architecture rtl of "+ nome_entidade + " is\n\
                 dic_key = j + "_reg"
                 dic_value = j + "_next"
                 dicionario_regs[dic_key] = dic_value
-        texto = texto + temp + "\n" + temp2 + "\n"
+        text = text + temp + "\n" + temp2 + "\n"
         temp = ""
         temp2 = ""
-    texto = texto + temp + "\n" + temp2 + "\
+    text = text + temp + "\n" + temp2 + "\
 begin\n\
 \n\
 -- Sequential process \n\
@@ -119,8 +119,8 @@ begin\n\
       state <= S0;\n\
     elsif rising_edge("+clk+") then\n"
     for key, value in dicionario_regs.items():
-        texto = texto + "      " + key + " <= " + value + ";"+"\n"
-    texto = texto+"\
+        text = text + "      " + key + " <= " + value + ";"+"\n"
+    text = text+"\
       state <= state_next;\n\
     end if;\n\
   end process;\n\
@@ -130,11 +130,11 @@ begin\n\
     temp = ""
     for key in dicionario_regs.keys():
         temp = temp + ", " + str(key)  
-    texto = texto + temp + ") is\n\
+    text = text + temp + ") is\n\
   begin\n"
     for key, value in dicionario_regs.items():
-        texto = texto + "    " + value + " <= " + key + ";"+"\n"
-    texto = texto + "    state_next <= state;\n\
+        text = text + "    " + value + " <= " + key + ";"+"\n"
+    text = text + "    state_next <= state;\n\
   \n\
     case state is\n\
 \n\
@@ -153,4 +153,4 @@ begin\n\
 \n\
 \n\
 end rtl;"
-    return texto
+    return text
