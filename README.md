@@ -30,8 +30,7 @@ leds-16
 ========================= ENGLISH VERSION =======================
 
 VHDL_GEN
-vhdl_gen is currently a simple VHDL generator that uses a .txt file as input and generates a complete VHDL design. It's not tested under Windows environment but should work. 
-Also there is only a Portuguese version of the code currently available.
+vhdl_gen is currently a simple VHDL generator that uses a .txt file as input and generates a complete VHDL design. It's not tested under Windows environment but should work.
 
 USAGE
 chmod +x the vhdl_gen.py file and execute it "./vhdl_gen.py ../FILE.txt"
