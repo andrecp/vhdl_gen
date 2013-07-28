@@ -10,25 +10,25 @@ now = datetime.datetime.now()
 
 def parse_vhdl(text):
     if '#' in text:
-        entrada = text.split('#')
-        temp = entrada[0]
+        splitted_text = text.split('#')
+        temp = splitted_text[0]
         temp = temp[:-1]
-        entrada[0] = temp
-        linhas = entrada[0].split("\n")
-        entrada[1] = entrada[1].split("\n")
-        s = cabecario_entidade()
-        s = declaracao_entidade(s,linhas[0])
-        s = declaracao_portas(s,linhas[1:],linhas[0])
-        s = adiciona_menos(s)
-        s = adiciona_arquitetura(s,linhas[0],linhas[1],linhas[2],entrada[1])
+        splitted_text[0] = temp
+        lines = splitted_text[0].split("\n")
+        splitted_text[1] = splitted_text[1].split("\n")
+        vhdl_text = entity_header()
+        vhdl_text = entity_declaration(vhdl_text,lines[0])
+        vhdl_text = ports_declaration(vhdl_text,lines[1:],lines[0])
+        vhdl_text = add_minus(vhdl_text)
+        vhdl_text = insert_architecture(vhdl_text,lines[0],lines[1],lines[2],splitted_text[1])
     else:
-        s = "Nao foi encontrado um # com os registradores no arquivo de entrada"
-    return s
+        vhdl_text = "the % symbol wasnt found in the .txt file"
+    return vhdl_text 
 
 def parse_tb(text):
     return text
 
-def cabecario_entidade():
+def entity_header():
     string = "------------------------------------------------------\n\
 -- Nome : "+getpass.getuser()+"\n\
 -- Criado em : " + now.strftime("%d-%m-%Y %H:%M") + "\n\
@@ -41,17 +41,17 @@ use ieee.std_logic_1164.all;\n\
 use ieee.numeric_std.all;\n"
     return string
 
-def declaracao_entidade(text,nome_entidade):
+def entity_declaration(text,entity_name):
     text = text + "\n\
-entity "+nome_entidade+" is\n\
+entity "+entity_name+" is\n\
   port (\n"
     return text
 
-def declaracao_portas(text,linhas_portas,nome_entidade):
-    for i in linhas_portas:
+def ports_declaration(text,lines_ports,entity_name):
+    for i in lines_ports:
         i = i.replace("\r","")
-        partes_linha = i.split("-");
-        for j in partes_linha:
+        splitted_line = i.split("-");
+        for j in splitted_line:
             if j == "entrada":
                 temp = temp + "  : in"
             elif j == "saida":
@@ -59,29 +59,29 @@ def declaracao_portas(text,linhas_portas,nome_entidade):
             elif j=="1":
                 temp = temp + " std_logic;"
             elif j.isdigit():
-                ajusta_bits = int(j)-1
-                temp = temp + " std_logic_vector(" + str(ajusta_bits) +" downto 0);"
+                adjust_bits = int(j)-1
+                temp = temp + " std_logic_vector(" + str(adjust_bits) +" downto 0);"
             else:
                 temp = "    "+j
         text=text+temp+"\n"
     text = text[:-2] + "\n"
     text = text + "    );\n"
-    text = text + "end " + nome_entidade + ";"
+    text = text + "end " + entity_name + ";"
     return text;
 
-def adiciona_menos(text):
+def add_minus(text):
     text = text + "\n\n------------------------------------------------------\n\n"
     return text
 
-def adiciona_arquitetura(text, nome_entidade,clk,rst,regs):
+def insert_architecture(text, entity_name,clk,rst,regs):
     clk = clk.split("-")
     clk = clk[0]
     rst = rst.split("-")
     rst = rst[0]
     regs = regs[1:-1]
-    dicionario_regs = {}
+    regs_dictionary = {}
     text = text +"\
-architecture rtl of "+ nome_entidade + " is\n\
+architecture rtl of "+ entity_name + " is\n\
   type STATE_MACHINE_TYPE is (S0,S1,S2,S3);\n\n\
   attribute SYN_ENCODING : string;\n\
   attribute SYN_ENCODING of STATE_MACHINE_TYPE : type is \"safe\";\n\
@@ -91,21 +91,21 @@ architecture rtl of "+ nome_entidade + " is\n\
 \n"
     for i in regs:
         i = i.replace("\r","")
-        partes_linha = i.split("-")
-        for j in partes_linha:
+        splitted_line = i.split("-")
+        for j in splitted_line:
             if j == "1":
                 temp = temp + " : std_logic;"
                 temp2 = temp2 + " : std_logic;"
             elif j.isdigit():
-                ajusta_bits = int(j)-1
-                temp = temp + " : std_logic_vector(" + str(ajusta_bits) + " downto 0);"
-                temp2 = temp2 + " : std_logic_vector(" + str(ajusta_bits) + " downto 0);"
+                adjust_bits = int(j)-1
+                temp = temp + " : std_logic_vector(" + str(adjust_bits) + " downto 0);"
+                temp2 = temp2 + " : std_logic_vector(" + str(adjust_bits) + " downto 0);"
             else:
                 temp = "  signal " + j + "_reg"
                 temp2 = "  signal " + j + "_next"
                 dic_key = j + "_reg"
                 dic_value = j + "_next"
-                dicionario_regs[dic_key] = dic_value
+                regs_dictionary[dic_key] = dic_value
         text = text + temp + "\n" + temp2 + "\n"
         temp = ""
         temp2 = ""
@@ -118,7 +118,7 @@ begin\n\
     if ("+rst+" = \'0\') then\n\
       state <= S0;\n\
     elsif rising_edge("+clk+") then\n"
-    for key, value in dicionario_regs.items():
+    for key, value in regs_dictionary.items():
         text = text + "      " + key + " <= " + value + ";"+"\n"
     text = text+"\
       state <= state_next;\n\
@@ -128,11 +128,11 @@ begin\n\
 -- Combinational process \n\
   process(state"
     temp = ""
-    for key in dicionario_regs.keys():
+    for key in regs_dictionary.keys():
         temp = temp + ", " + str(key)  
     text = text + temp + ") is\n\
   begin\n"
-    for key, value in dicionario_regs.items():
+    for key, value in regs_dictionary.items():
         text = text + "    " + value + " <= " + key + ";"+"\n"
     text = text + "    state_next <= state;\n\
   \n\
