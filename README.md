@@ -4,7 +4,7 @@ VHDL_GEN
 vhdl_gen é um gerador de VHDL simples que utiliza um arquivo .txt como entrada e gera um design completo em VHDL, ainda não foi testado em windows mas deve funcionar.
 
 UTILIZACAO
-chmod +x o arquivo vhdl_gen.py e execute-o "./vhdl_gen.py path_to_.txt"
+chmod +x o arquivo vhdl_gen.py e execute-o "./vhdl_gen.py ../ARQUIVO.txt"
 
 Um arquivo .vhd vai ser criado com todas as entradas, saidas e os sinais internos declarados com base no arquivo .txt, a biblioteca padrão 1164 e a numeric_std serão utilizadas.
 
@@ -34,7 +34,7 @@ vhdl_gen is currently a simple VHDL generator that uses a .txt file as input and
 Also there is only a Portuguese version of the code currently available.
 
 USAGE
-chmod +x the vhdl_gen.py file and execute it "./vhdl_gen.py path_to_.txt"
+chmod +x the vhdl_gen.py file and execute it "./vhdl_gen.py ../FILE.txt"
 
 A .vhd file will be created with all the inputs and outputs and internal signals declared in the .txt file, the standard 1164 library and the numeric_std library are going to be used.
 
