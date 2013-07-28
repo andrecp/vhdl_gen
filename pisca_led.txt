@@ -1,0 +1,8 @@
+pisca_led
+sysclk-entrada-1
+reset_n-entrada-1
+enable-entrada-1
+leds-saida-16
+#
+timer-16
+leds_i-16
