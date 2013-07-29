@@ -3,25 +3,174 @@
 
 import sys
 import os
-import vhdl_parser
- 
-src_file_path = sys.argv[1]
+from datetime import datetime
+from getpass import getuser
 
-src_file_path = os.path.abspath(src_file_path)
-print "Path to the VHDL File: ",src_file_path
-src_file_dir = os.path.dirname(src_file_path)
+def parse_vhdl(text):
+    if '#' in text:
+        splitted_text = text.split('#')
+        temp = splitted_text[0]
+        temp = temp[:-1]
+        splitted_text[0] = temp
+        lines = splitted_text[0].split("\n")
+        splitted_text[1] = splitted_text[1].split("\n")
+        vhdl_text = entity_header()
+        vhdl_text = entity_declaration(vhdl_text,lines[0])
+        vhdl_text = ports_declaration(vhdl_text,lines[1:],lines[0])
+        vhdl_text = add_minus(vhdl_text)
+        vhdl_text = insert_architecture(vhdl_text,lines[0],lines[1],lines[2],splitted_text[1])
+    else:
+        vhdl_text = "the % symbol wasnt found in the .txt file"
+    return vhdl_text 
 
-src_file_fd = open(src_file_path, 'r')
-text = src_file_fd.read()
-src_file_fd.close()
+def parse_tb(text):
+    return text
 
-vhdl_path = os.path.splitext(src_file_path)[0] + '.vhd'
+def entity_header():
+    string = "------------------------------------------------------\n\
+-- Name : " + getuser()+"\n\
+-- Created at : " + datetime.now().strftime("%d-%m-%Y %H:%M") + "\n\
+------------------------------------------------------\n\
+\n\
+--Libraries and use clauses\n \
+\n\
+library ieee;\n\
+use ieee.std_logic_1164.all;\n\
+use ieee.numeric_std.all;\n"
+    return string
 
-dest_file_fd = open(vhdl_path, 'w')
+def entity_declaration(text,entity_name):
+    text = text + "\n\
+entity "+entity_name+" is\n\
+  port (\n"
+    return text
 
-generated_vhdl = vhdl_parser.parse_vhdl(text)
+def ports_declaration(text,lines_ports,entity_name):
+    for i in lines_ports:
+        i = i.replace("\r","")
+        splitted_line = i.split("-");
+        for j in splitted_line:
+            if j == "in":
+                temp = temp + "  : in"
+            elif j == "out":
+                temp = temp + "  : out"
+            elif j=="1":
+                temp = temp + " std_logic;"
+            elif j.isdigit():
+                adjust_bits = int(j)-1
+                temp = temp + " std_logic_vector(" + str(adjust_bits) +" downto 0);"
+            else:
+                temp = "    "+j
+        text=text+temp+"\n"
+    text = text[:-2] + "\n"
+    text = text + "    );\n"
+    text = text + "end " + entity_name + ";"
+    return text;
 
-dest_file_fd.write(generated_vhdl)
-dest_file_fd.close()
+def add_minus(text):
+    text = text + "\n\n------------------------------------------------------\n\n"
+    return text
 
-print 'VHDL file created in the ' + src_file_dir + '/ folder with sucess'
+def insert_architecture(text, entity_name,clk,rst,regs):
+    clk = clk.split("-")
+    clk = clk[0]
+    rst = rst.split("-")
+    rst = rst[0]
+    regs = regs[1:-1]
+    regs_dictionary = {}
+    text = text +"\
+architecture rtl of "+ entity_name + " is\n\
+  type STATE_MACHINE_TYPE is (S0,S1,S2,S3);\n\n\
+  attribute SYN_ENCODING : string;\n\
+  attribute SYN_ENCODING of STATE_MACHINE_TYPE : type is \"safe\";\n\
+\n\
+  signal state      : STATE_MACHINE_TYPE;\n\
+  signal state_next : STATE_MACHINE_TYPE;\n\
+\n"
+    for i in regs:
+        i = i.replace("\r","")
+        splitted_line = i.split("-")
+        for j in splitted_line:
+            if j == "1":
+                temp = temp + " : std_logic;"
+                temp2 = temp2 + " : std_logic;"
+            elif j.isdigit():
+                adjust_bits = int(j)-1
+                temp = temp + " : std_logic_vector(" + str(adjust_bits) + " downto 0);"
+                temp2 = temp2 + " : std_logic_vector(" + str(adjust_bits) + " downto 0);"
+            else:
+                temp = "  signal " + j + "_reg"
+                temp2 = "  signal " + j + "_next"
+                dic_key = j + "_reg"
+                dic_value = j + "_next"
+                regs_dictionary[dic_key] = dic_value
+        text = text + temp + "\n" + temp2 + "\n"
+        temp = ""
+        temp2 = ""
+    text = text + temp + "\n" + temp2 + "\
+begin\n\
+\n\
+-- Sequential process \n\
+  process("+clk+", "+rst+") is\n\
+  begin\n\
+    if ("+rst+" = \'0\') then\n\
+      state <= S0;\n\
+    elsif rising_edge("+clk+") then\n"
+    for key, value in regs_dictionary.items():
+        text = text + "      " + key + " <= " + value + ";"+"\n"
+    text = text+"\
+      state <= state_next;\n\
+    end if;\n\
+  end process;\n\
+\n\
+-- Combinational process \n\
+  process(state"
+    temp = ""
+    for key in regs_dictionary.keys():
+        temp = temp + ", " + str(key)  
+    text = text + temp + ") is\n\
+  begin\n"
+    for key, value in regs_dictionary.items():
+        text = text + "    " + value + " <= " + key + ";"+"\n"
+    text = text + "    state_next <= state;\n\
+  \n\
+    case state is\n\
+\n\
+      when S0 =>\n\
+          null;\n\
+      when S1 =>\n\
+          null;\n\
+      when S2 =>\n\
+          null;\n\
+      when S3 =>\n\
+          null;\n\
+      when OTHERS =>\n\
+          null;\n\
+    end case;\n\
+  end process;\n\
+\n\
+\n\
+end rtl;"
+    return text
+
+if __name__ == "__main__":
+    src_file_path = sys.argv[1]
+
+    src_file_path = os.path.abspath(src_file_path)
+    print "Path to the VHDL File: ",src_file_path
+    src_file_dir = os.path.dirname(src_file_path)
+
+    src_file_fd = open(src_file_path, 'r')
+    text = src_file_fd.read()
+    src_file_fd.close()
+
+    vhdl_path = os.path.splitext(src_file_path)[0] + '.vhd'
+
+    dest_file_fd = open(vhdl_path, 'w')
+
+    generated_vhdl = parse_vhdl(text)
+
+    dest_file_fd.write(generated_vhdl)
+    dest_file_fd.close()
+
+    print 'VHDL file created in the ' + src_file_dir + '/ folder with sucess'
