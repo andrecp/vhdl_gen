@@ -3,25 +3,25 @@
 
 import sys
 import os
-import format_path
 import vhdl_parser
  
 src_file_path = sys.argv[1]
+
+src_file_path = os.path.abspath(src_file_path)
 print "Path to the VHDL File: ",src_file_path
+src_file_dir = os.path.dirname(src_file_path)
 
-src_file = open(src_file_path, 'r')
-src_file_path = src_file_path.replace(".txt","")
-src_file_path = src_file_path.replace("../","")
-text = src_file.read()
+src_file_fd = open(src_file_path, 'r')
+text = src_file_fd.read()
+src_file_fd.close()
 
-vhdl_path = format_path.format_top(src_file_path)
+vhdl_path = os.path.splitext(src_file_path)[0] + '.vhd'
 
-dest_file = open(vhdl_path, 'w')
+dest_file_fd = open(vhdl_path, 'w')
 
 generated_vhdl = vhdl_parser.parse_vhdl(text)
 
-dest_file.write(generated_vhdl)
-dest_file.close()
-src_file.close()
+dest_file_fd.write(generated_vhdl)
+dest_file_fd.close()
 
-print "VHDL file created in the .txt file folder with sucess"
+print 'VHDL file created in the ' + src_file_dir + '/ folder with sucess'
