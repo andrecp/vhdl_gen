@@ -13,16 +13,16 @@ Tambem sera criada uma maquina de estados do tipo em que se separa a parte combi
 ARQUIVO DE ENTRADA
 o arquivo .txt deve seguir este template
 ENTIDADE
-NomeES-entrada/saida-numeroDeBits
+NomeES-in/out-numeroDeBits
 #
 NomeSINAL-numeroDeBits
 
 EXEMPLO DE ARQUIVO DE ENTRADA
 pisca_led
-sysclk-entrada-1
-reset_n-entrada-1
-enable-entrada-1
-leds-saida-16
+sysclk-in-1
+reset_n-in-1
+enable-in-1
+leds-out-16
 #
 timer-16
 leds-16
@@ -42,16 +42,16 @@ Also a state machine is going to be used with the two state machine style, one w
 INPUT FILE
 The .txt file MUST have the following template
 ENTITY
-IO_name-entrada/saida-number_of_bits
+IO_name-in/out-number_of_bits
 #
 signal_name-number_of_bits
 
 EXAMPLE OF INPUT FILE
 blink_led
-sysclk-entrada-1
-reset_n-entrada-1
-enable-entrada-1
-leds-saida-16
+sysclk-in-1
+reset_n-in-1
+enable-in-1
+leds-out-16
 #
 timer-16
 leds-16
