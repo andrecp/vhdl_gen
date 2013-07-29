@@ -1,31 +1,5 @@
-Scroll down for the English version
+Scroll down for the Portuguese version
 
-VHDL_GEN
-vhdl_gen é um gerador de VHDL simples que utiliza um arquivo .txt como entrada e gera um design completo em VHDL, ainda não foi testado em windows mas deve funcionar.
-
-UTILIZACAO
-chmod +x o arquivo vhdl_gen.py e execute-o "./vhdl_gen.py ../ARQUIVO.txt"
-
-Um arquivo .vhd vai ser criado com todas as entradas, saidas e os sinais internos declarados com base no arquivo .txt, a biblioteca padrão 1164 e a numeric_std serão utilizadas.
-
-Tambem sera criada uma maquina de estados do tipo em que se separa a parte combinacional e sequencial do design.
-
-ARQUIVO DE ENTRADA
-o arquivo .txt deve seguir este template
-ENTIDADE
-NomeES-in/out-numeroDeBits
-#
-NomeSINAL-numeroDeBits
-
-EXEMPLO DE ARQUIVO DE ENTRADA
-pisca_led
-sysclk-in-1
-reset_n-in-1
-enable-in-1
-leds-out-16
-#
-timer-16
-leds-16
 
 ========================= ENGLISH VERSION =======================
 
@@ -55,3 +29,33 @@ leds-out-16
 #
 timer-16
 leds-16
+
+========================= PORTUGUESE VERSION =======================
+
+VHDL_GEN
+vhdl_gen é um gerador de VHDL simples que utiliza um arquivo .txt como entrada e gera um design completo em VHDL, ainda não foi testado em windows mas deve funcionar.
+
+UTILIZACAO
+chmod +x o arquivo vhdl_gen.py e execute-o "./vhdl_gen.py ../ARQUIVO.txt"
+
+Um arquivo .vhd vai ser criado com todas as entradas, saidas e os sinais internos declarados com base no arquivo .txt, a biblioteca padrão 1164 e a numeric_std serão utilizadas.
+
+Tambem sera criada uma maquina de estados do tipo em que se separa a parte combinacional e sequencial do design.
+
+ARQUIVO DE ENTRADA
+o arquivo .txt deve seguir este template
+ENTIDADE
+NomeES-in/out-numeroDeBits
+#
+NomeSINAL-numeroDeBits
+
+EXEMPLO DE ARQUIVO DE ENTRADA
+pisca_led
+sysclk-in-1
+reset_n-in-1
+enable-in-1
+leds-out-16
+#
+timer-16
+leds-16
+
