@@ -15,6 +15,8 @@ Also a state machine is going to be used with the two state machine style, one w
 
 INPUT FILE
 The .txt file MUST have the following template
+Please note that the first IO_name MUST BE THE CLOCK and the second THE RESET.
+
 ENTITY
 IO_name-in/out-number_of_bits
 #
@@ -43,7 +45,7 @@ Um arquivo .vhd vai ser criado com todas as entradas, saidas e os sinais interno
 Tambem sera criada uma maquina de estados do tipo em que se separa a parte combinacional e sequencial do design.
 
 ARQUIVO DE ENTRADA
-o arquivo .txt deve seguir este template
+o arquivo .txt deve seguir este template, o primeiro NomeES deve ser o clock e o segundo o reset.
 ENTIDADE
 NomeES-in/out-numeroDeBits
 #
