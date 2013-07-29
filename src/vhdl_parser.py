@@ -52,9 +52,9 @@ def ports_declaration(text,lines_ports,entity_name):
         i = i.replace("\r","")
         splitted_line = i.split("-");
         for j in splitted_line:
-            if j == "entrada":
+            if j == "in":
                 temp = temp + "  : in"
-            elif j == "saida":
+            elif j == "out":
                 temp = temp + "  : out"
             elif j=="1":
                 temp = temp + " std_logic;"

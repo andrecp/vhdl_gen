@@ -1,4 +1,4 @@
-pisca_led
+blink_led
 sysclk-in-1
 reset_n-in-1
 enable-in-1
